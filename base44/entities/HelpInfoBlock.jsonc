@@ -1,0 +1,30 @@
+{
+  "name": "HelpInfoBlock",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Title"
+    },
+    "imageUrl": {
+      "type": "string",
+      "title": "Image URL"
+    },
+    "detailContent": {
+      "type": "string",
+      "title": "Detail Content"
+    },
+    "sortOrder": {
+      "type": "number",
+      "title": "Sort Order"
+    },
+    "isActive": {
+      "type": "boolean",
+      "title": "Active"
+    }
+  },
+  "required": [
+    "title",
+    "sortOrder"
+  ]
+}

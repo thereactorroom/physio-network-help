@@ -1,0 +1,29 @@
+{
+  "name": "HelpMenuConfig",
+  "type": "object",
+  "properties": {
+    "moduleName": {
+      "type": "string",
+      "title": "Module Name"
+    },
+    "headerTitle": {
+      "type": "string",
+      "title": "Header Title"
+    },
+    "headerDescription": {
+      "type": "string",
+      "title": "Header Description"
+    },
+    "whatsappHelpUrl": {
+      "type": "string",
+      "title": "WhatsApp Help URL"
+    },
+    "whatsappHelpEnabled": {
+      "type": "boolean",
+      "title": "Activate WhatsApp Help"
+    }
+  },
+  "required": [
+    "headerTitle"
+  ]
+}
