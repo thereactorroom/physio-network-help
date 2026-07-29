@@ -20,25 +20,12 @@ export default function HelpAdmin() {
   const [whatsappUrl, setWhatsappUrl] = useState("");
   const [whatsappEnabled, setWhatsappEnabled] = useState(false);
   const [savingConfig, setSavingConfig] = useState(false);
-  const [selectedContact, setSelectedContact] = useState(null);
 
   useEffect(() => {
     base44.auth.me().then((u) => {
       if (u?.role !== "admin") navigate("/help" + window.location.search);
       setUser(u);
     });
-  }, []);
-
-  useEffect(() => {
-    window.phoneContactWallet = (data) => {
-      try {
-        const contact = typeof data === 'string' ? JSON.parse(data) : data;
-        setSelectedContact(contact);
-      } catch {
-        setSelectedContact(data);
-      }
-    };
-    return () => { delete window.phoneContactWallet; };
   }, []);
 
   const { data: configs = [] } = useQuery({
@@ -204,82 +191,6 @@ export default function HelpAdmin() {
         {blocks.length === 0 && (
           <p className="text-center text-sm text-muted-foreground py-8">No info blocks yet. Tap Add to create one.</p>
         )}
-
-        {/* Phonebook Section */}
-        <div className="mt-8">
-          <h2 className="text-sm font-semibold text-foreground mb-4">Phonebook</h2>
-          <div className="bg-card border rounded-xl p-4">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                window.CommunicationBridge.postMessage(JSON.stringify({
-                  request: 'phoneContact',
-                  payload: "{}",
-                  hook: 'phoneContactWallet'
-                }));
-              }}
-            >
-              Contacts
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full mt-2"
-              onClick={() => {
-                window.phoneContactWallet(JSON.stringify({
-                  firstName: "Jane",
-                  lastName: "Smith",
-                  phone: "+27 82 123 4567",
-                  email: "jane.smith@example.com",
-                  company: "Acme Corp"
-                }));
-              }}
-            >
-              Contact Test
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full mt-2"
-              onClick={() => {
-                window.CommunicationBridge.postMessage(JSON.stringify({
-                  request: 'browser',
-                  payload: {'uri':'https://www.yahoo.com','load':'foreground','nav':{'addressBar':true,'onclose':'onBrowserClose'}},
-                  hook: 'browserHook'
-                }));
-              }}
-            >
-              Open Browser
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full mt-2"
-              onClick={() => {
-                window.CommunicationBridge.postMessage(JSON.stringify({
-                  request: 'browser',
-                  payload: {'uri':'https://wa.me/27720980200?text=Type%20your%20message%20here.','load':'background'},
-                  hook: ''
-                }));
-              }}
-            >
-              Open WhatsApp
-            </Button>
-
-            {selectedContact && (
-              <div className="mt-4 rounded-lg bg-muted p-3 space-y-1">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Selected Contact</p>
-                {Object.entries(selectedContact).map(([key, value]) => (
-                  <div key={key} className="flex gap-2 text-sm">
-                    <span className="font-medium text-foreground capitalize min-w-[80px]">{key}:</span>
-                    <span className="text-muted-foreground break-all">{String(value)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );
