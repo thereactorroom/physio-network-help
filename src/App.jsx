@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { useLayoutEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -9,6 +10,30 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import HelpDirectory from './pages/HelpDirectory';
 import HelpDetail from './pages/HelpDetail';
 import HelpAdmin from './pages/HelpAdmin';
+
+// Makes route paths case-insensitive: lowercases known static segments
+// ('help', 'admin') while leaving dynamic IDs (blockId) untouched.
+function NormalizePath() {
+  const { pathname, search, hash } = useLocation();
+  const navigate = useNavigate();
+  useLayoutEffect(() => {
+    const segments = pathname.split('/').filter(Boolean);
+    let changed = false;
+    const normalized = segments.map((seg) => {
+      const lower = seg.toLowerCase();
+      if (lower === 'help' || lower === 'admin') {
+        if (seg !== lower) changed = true;
+        return lower;
+      }
+      return seg;
+    });
+    if (changed) {
+      const newPath = (normalized.length ? '/' + normalized.join('/') : '/') + search + hash;
+      navigate(newPath, { replace: true });
+    }
+  }, [pathname]);
+  return null;
+}
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -35,13 +60,16 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <Routes>
-      <Route path="/" element={<HelpDirectory />} />
-      <Route path="/help" element={<HelpDirectory />} />
-      <Route path="/help/:blockId" element={<HelpDetail />} />
-      <Route path="/help/admin" element={<HelpAdmin />} />
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
+    <>
+      <NormalizePath />
+      <Routes>
+        <Route path="/" element={<HelpDirectory />} />
+        <Route path="/help" element={<HelpDirectory />} />
+        <Route path="/help/:blockId" element={<HelpDetail />} />
+        <Route path="/help/admin" element={<HelpAdmin />} />
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
+    </>
   );
 };
 
