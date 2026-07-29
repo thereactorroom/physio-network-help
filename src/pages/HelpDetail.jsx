@@ -89,7 +89,7 @@ export default function HelpDetail() {
               <button
                 onClick={() => navigate("/help" + window.location.search)}
                 style={{ touchAction: 'manipulation' }}
-                className="flex items-center justify-center gap-1.5 min-h-[44px] min-w-[88px] px-4 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold select-none active:opacity-80"
+                className="relative z-30 flex items-center justify-center gap-1.5 min-h-[44px] min-w-[88px] px-4 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold select-none active:opacity-80"
               >
                 <ArrowLeft className="w-4 h-4" /> Back
               </button>
@@ -99,7 +99,7 @@ export default function HelpDetail() {
       </div>
 
       {/* Scrollable Content */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto relative z-0" style={{ paddingTop: headerHeight }}>
+      <div ref={scrollRef} className="flex-1 overflow-y-auto relative isolate z-0" style={{ paddingTop: headerHeight }}>
         <div className="max-w-lg mx-auto px-5 pb-4">
           <div
             className="prose prose-sm max-w-none text-foreground/80"
