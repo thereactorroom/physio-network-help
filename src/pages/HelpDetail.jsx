@@ -89,7 +89,7 @@ export default function HelpDetail() {
               <button
                 onClick={() => navigate("/help" + window.location.search)}
                 style={{ touchAction: 'manipulation' }}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-medium active:opacity-90 transition-opacity"
+                className="flex items-center justify-center gap-1.5 min-h-[44px] min-w-[88px] px-4 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold select-none active:opacity-80"
               >
                 <ArrowLeft className="w-4 h-4" /> Back
               </button>
