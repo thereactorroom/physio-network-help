@@ -77,7 +77,18 @@ export default function HelpDirectory() {
             {config?.headerDescription || "Select the tutorial you would like to read up more on."}
           </p>
 
-          <div className="mt-3 mb-1 flex items-end justify-between">
+          <div className="mt-3 mb-1 flex items-center justify-between">
+            {config?.whatsappHelpEnabled && config?.whatsappHelpUrl && (
+              <Button
+                onClick={() => window.parent.postMessage({ action: 'openWhatsApp', payload: config.whatsappHelpUrl }, origin || '*')}
+                className="gap-1.5"
+                variant="default"
+                size="sm"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Help via WhatsApp
+              </Button>
+            )}
             {isAdmin && (
               <button
                 onClick={() => navigate("/help/admin" + window.location.search)}
@@ -86,17 +97,6 @@ export default function HelpDirectory() {
                 <Settings className="w-3.5 h-3.5" />
                 Tap here to manage
               </button>
-            )}
-            {config?.whatsappHelpEnabled && config?.whatsappHelpUrl && (
-              <Button
-                onClick={() => window.parent.postMessage({ action: 'openWhatsApp', payload: config.whatsappHelpUrl }, origin || '*')}
-                className="ml-auto gap-1.5"
-                variant="default"
-                size="sm"
-              >
-                <MessageCircle className="w-4 h-4" />
-                Help via WhatsApp
-              </Button>
             )}
           </div>
         </div>
