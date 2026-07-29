@@ -23,7 +23,7 @@ export default function HelpDirectory() {
 
   const params = new URLSearchParams(window.location.search);
   const [isAdminUser, setIsAdminUser] = useState(false);
-  const isAdmin = params.get("isAdmin")?.toLowerCase() === "true" || isAdminUser;
+  const isAdmin = params.get("Admin")?.toLowerCase() === "true" || isAdminUser;
 
   useEffect(() => {
     base44.auth.me().then((u) => {
