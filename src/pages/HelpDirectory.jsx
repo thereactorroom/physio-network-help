@@ -30,12 +30,14 @@ export default function HelpDirectory() {
       if (u?.role === "admin") setIsAdminUser(true);
     }).catch(() => {});
   }, []);
-  const action = params.get("action");
   const origin = params.get("origin");
 
   useEffect(() => {
-    if (action && origin) {
-      window.parent.postMessage({ action, payload: 'appready' }, origin);
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get("action");
+    const targetOrigin = urlParams.get("origin");
+    if (action && targetOrigin) {
+      window.parent.postMessage({ action, payload: 'appready' }, targetOrigin);
     }
   }, []);
 
