@@ -88,7 +88,7 @@ export default function HelpDetail() {
               )}
               <button
                 onClick={() => navigate("/help" + window.location.search)}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-primary text-primary text-sm font-medium bg-white hover:bg-primary hover:text-white transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
               >
                 <ArrowLeft className="w-4 h-4" /> Back
               </button>
