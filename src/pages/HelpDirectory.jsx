@@ -3,8 +3,11 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import InfoBlockCard from "../components/InfoBlockCard";
+import FusionCloseButton from "../components/FusionCloseButton";
 import { Settings, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getUrlParam } from "@/lib/urlParams";
+import { isInFusionIframe, isFusionAdmin, waitForFusionBridge, fusionWhatsApp } from "@/lib/fusionBridge";
 
 export default function HelpDirectory() {
   const navigate = useNavigate();
@@ -21,23 +24,25 @@ export default function HelpDirectory() {
     return () => observer.disconnect();
   }, []);
 
-  const params = new URLSearchParams(window.location.search);
   const [isAdminUser, setIsAdminUser] = useState(false);
-  const isAdmin = params.get("Admin")?.toLowerCase() === "true" || isAdminUser;
+  const adminParam = getUrlParam("Admin")?.toLowerCase() === "true";
+  const isAdmin = adminParam || isAdminUser;
 
   useEffect(() => {
-    base44.auth.me().then((u) => {
-      if (u?.role === "admin") setIsAdminUser(true);
-    }).catch(() => {});
-  }, []);
-  const origin = params.get("origin");
+    // Admin=true URL param overrides everything — no lookup needed.
+    if (adminParam) return;
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get("action");
-    const targetOrigin = urlParams.get("origin");
-    if (action && targetOrigin) {
-      window.parent.postMessage({ action, payload: 'appready' }, targetOrigin);
+    if (isInFusionIframe()) {
+      // Embedded in fusion — wait for the bridge script to load, then check admin.
+      waitForFusionBridge()
+        .then(() => isFusionAdmin())
+        .then((isAdmin) => setIsAdminUser(isAdmin))
+        .catch(() => setIsAdminUser(false));
+    } else {
+      // Direct access — fall back to the base44 user role.
+      base44.auth.me().then((u) => {
+        if (u?.role === "admin") setIsAdminUser(true);
+      }).catch(() => {});
     }
   }, []);
 
@@ -55,7 +60,7 @@ export default function HelpDirectory() {
 
   const blocks = isAdmin ? allBlocks : allBlocks.filter((b) => b.isActive !== false);
 
-  const returnUrl = params.get("returnUrl") || "/";
+  const returnUrl = getUrlParam("returnUrl") || "/";
 
   const handleClose = () => {
     if (returnUrl.startsWith("http")) {
@@ -80,7 +85,7 @@ export default function HelpDirectory() {
           <div className="mt-3 mb-1 flex items-center justify-between">
             {config?.whatsappHelpEnabled && config?.whatsappHelpUrl && (
               <Button
-                onClick={() => window.parent.postMessage({ action: 'openWhatsApp', payload: config.whatsappHelpUrl }, origin || '*')}
+                onClick={() => fusionWhatsApp(config.whatsappHelpUrl)}
                 className="gap-1.5"
                 variant="default"
                 size="sm"
@@ -127,6 +132,8 @@ export default function HelpDirectory() {
           </div>
         </div>
       </div>
+
+      <FusionCloseButton />
     </div>
   );
 }

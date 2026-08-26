@@ -6,6 +6,9 @@ import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import IframeReadyBridge from './components/IframeReadyBridge';
+import IframeDetector from './components/IframeDetector';
+import { isInFusionIframe } from '@/lib/fusionBridge';
 // Add page imports here
 import HelpDirectory from './pages/HelpDirectory';
 import HelpDetail from './pages/HelpDetail';
@@ -38,8 +41,12 @@ function NormalizePath() {
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
+  // Detect fusion iframe — skip loading/auth gates for optimistic UI when embedded
+  const isFusionIframe = isInFusionIframe();
+
   // Show loading spinner while checking app public settings or auth
-  if (isLoadingPublicSettings || isLoadingAuth) {
+  // (skipped for fusion iframes — optimistic UI)
+  if (!isFusionIframe && (isLoadingPublicSettings || isLoadingAuth)) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
@@ -47,8 +54,8 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
-  if (authError) {
+  // Handle authentication errors (skipped for fusion iframes)
+  if (!isFusionIframe && authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
@@ -61,8 +68,10 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <>
-      <NormalizePath />
-      <Routes>
+    <IframeDetector />
+    <IframeReadyBridge />
+    <NormalizePath />
+    <Routes>
         <Route path="/" element={<HelpDirectory />} />
         <Route path="/help" element={<HelpDirectory />} />
         <Route path="/help/:blockId" element={<HelpDetail />} />
